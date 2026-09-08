@@ -11,8 +11,8 @@ export const getMovies = async (req, res) => {
     status,
     rated,
     search,
-    sortBy,
-    sortOrder,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
   } = req.query;
 
   const skip = (page - 1) * perPage;
@@ -42,9 +42,10 @@ export const getMovies = async (req, res) => {
 
   const [totalItems, movies] = await Promise.all([
     moviesQuery.clone().countDocuments(),
-    (await moviesQuery.skip(skip).limit(perPage)).toSorted({
-      [sortBy]: sortOrder,
-    }),
+    moviesQuery
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(perPage),
   ]);
 
   const totalPages = Math.ceil(totalItems / perPage);

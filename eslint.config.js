@@ -14,4 +14,10 @@ export default defineConfig([
       'no-undef': 'error',
     },
   },
+  {
+    files: ['tests/**/*.js'],
+    languageOptions: {
+      globals: globals.jest,
+    },
+  },
 ]);
