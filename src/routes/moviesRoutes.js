@@ -20,7 +20,7 @@ const router = Router();
  * @swagger
  * /movies:
  *   get:
- *     summary: Отримати список фільмів з пагінацією, пошуком і фільтрами
+ *     summary: Get a paginated list of movies with search and filters
  *     tags: [Movies]
  *     parameters:
  *       - in: query
@@ -35,7 +35,7 @@ const router = Router();
  *       - in: query
  *         name: genres
  *         schema: { type: string }
- *         description: Жанри через кому, напр. Drama,Action
+ *         description: Comma-separated genres, e.g. Drama,Action
  *       - in: query
  *         name: status
  *         schema: { type: string, enum: [plan, watching, watched] }
@@ -56,7 +56,7 @@ const router = Router();
  *         schema: { type: string, enum: [asc, desc] }
  *     responses:
  *       200:
- *         description: Список фільмів із пагінацією
+ *         description: Paginated list of movies
  */
 router.get('/movies', celebrate(getMoviesSchema), getMovies);
 
@@ -64,7 +64,7 @@ router.get('/movies', celebrate(getMoviesSchema), getMovies);
  * @swagger
  * /movies/{movieId}:
  *   get:
- *     summary: Отримати фільм за ID
+ *     summary: Get a movie by ID
  *     tags: [Movies]
  *     parameters:
  *       - in: path
@@ -73,9 +73,9 @@ router.get('/movies', celebrate(getMoviesSchema), getMovies);
  *         schema: { type: string }
  *     responses:
  *       200:
- *         description: Знайдений фільм
+ *         description: Movie found
  *       404:
- *         description: Фільм не знайдено
+ *         description: Movie not found
  */
 router.get('/movies/:movieId', celebrate(movieIdParamSchema), getMovieById);
 
@@ -83,7 +83,7 @@ router.get('/movies/:movieId', celebrate(movieIdParamSchema), getMovieById);
  * @swagger
  * /movies:
  *   post:
- *     summary: Додати новий фільм
+ *     summary: Add a new movie
  *     tags: [Movies]
  *     requestBody:
  *       required: true
@@ -106,9 +106,9 @@ router.get('/movies/:movieId', celebrate(movieIdParamSchema), getMovieById);
  *               myRating: { type: integer, minimum: 1, maximum: 10 }
  *     responses:
  *       201:
- *         description: Фільм створено
+ *         description: Movie created
  *       400:
- *         description: Помилка валідації
+ *         description: Validation error
  */
 router.post('/movies', celebrate(createMovieSchema), createMovie);
 
@@ -116,7 +116,7 @@ router.post('/movies', celebrate(createMovieSchema), createMovie);
  * @swagger
  * /movies/{movieId}:
  *   delete:
- *     summary: Видалити фільм
+ *     summary: Delete a movie
  *     tags: [Movies]
  *     parameters:
  *       - in: path
@@ -125,9 +125,9 @@ router.post('/movies', celebrate(createMovieSchema), createMovie);
  *         schema: { type: string }
  *     responses:
  *       200:
- *         description: Фільм видалено
+ *         description: Movie deleted
  *       404:
- *         description: Фільм не знайдено
+ *         description: Movie not found
  */
 router.delete('/movies/:movieId', celebrate(movieIdParamSchema), deleteMovie);
 
@@ -135,7 +135,7 @@ router.delete('/movies/:movieId', celebrate(movieIdParamSchema), deleteMovie);
  * @swagger
  * /movies/{movieId}:
  *   patch:
- *     summary: Оновити фільм (статус, оцінку тощо)
+ *     summary: Update a movie (status, rating, etc.)
  *     tags: [Movies]
  *     parameters:
  *       - in: path
@@ -153,11 +153,11 @@ router.delete('/movies/:movieId', celebrate(movieIdParamSchema), deleteMovie);
  *               myRating: { type: integer, minimum: 1, maximum: 10 }
  *     responses:
  *       200:
- *         description: Фільм оновлено
+ *         description: Movie updated
  *       400:
- *         description: Помилка валідації
+ *         description: Validation error
  *       404:
- *         description: Фільм не знайдено
+ *         description: Movie not found
  */
 router.patch(
   '/movies/:movieId',
