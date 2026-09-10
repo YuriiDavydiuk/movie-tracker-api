@@ -73,7 +73,7 @@ const movieFields = {
   status: Joi.string().valid('plan', 'watching', 'watched').messages({
     'any.only': 'Status must be one of: plan, watching, watched',
   }),
-  myRating: Joi.number().min(1).max(10).messages({
+  myRating: Joi.number().min(1).max(10).allow(null).messages({
     'number.min': 'Rating must be between 1 and 10',
     'number.max': 'Rating must be between 1 and 10',
   }),
