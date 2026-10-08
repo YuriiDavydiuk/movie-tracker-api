@@ -107,7 +107,17 @@ export const getMoviesSchema = {
     perPage: Joi.number().integer().min(1).max(20).default(10),
     genres: Joi.string().custom(genresValidator),
     minRating: Joi.number().min(0).max(10),
-    maxRating: Joi.number().min(0).max(10),
+    maxRating: Joi.number()
+      .min(0)
+      .max(10)
+      .when('minRating', {
+        is: Joi.exist(),
+        then: Joi.number().min(Joi.ref('minRating')),
+      })
+      .messages({
+        'number.min':
+          'maxRating must be at least 0 and not less than min rating',
+      }),
     status: Joi.string().valid('plan', 'watching', 'watched'),
     rated: Joi.boolean(),
     search: Joi.string().trim().allow(''),

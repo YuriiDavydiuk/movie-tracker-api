@@ -19,9 +19,8 @@ export const getMovies = async (req, res) => {
   const moviesQuery = Movie.find();
 
   if (search) {
-    moviesQuery.where({
-      title: { $regex: search, $options: 'i' },
-    });
+    const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    moviesQuery.where({ title: { $regex: escapedSearch, $options: 'i' } });
   }
   if (genres) {
     moviesQuery.where('genres').in(genres.split(',').map((g) => g.trim()));

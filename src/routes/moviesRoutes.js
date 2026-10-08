@@ -14,6 +14,8 @@ import {
   updateMovie,
 } from '../controllers/movieController.js';
 
+import { authenticate } from '../middleware/authenticate.js';
+
 const router = Router();
 
 /**
@@ -110,7 +112,7 @@ router.get('/movies/:movieId', celebrate(movieIdParamSchema), getMovieById);
  *       400:
  *         description: Validation error
  */
-router.post('/movies', celebrate(createMovieSchema), createMovie);
+router.post('/movies', authenticate, celebrate(createMovieSchema), createMovie);
 
 /**
  * @swagger
@@ -129,7 +131,12 @@ router.post('/movies', celebrate(createMovieSchema), createMovie);
  *       404:
  *         description: Movie not found
  */
-router.delete('/movies/:movieId', celebrate(movieIdParamSchema), deleteMovie);
+router.delete(
+  '/movies/:movieId',
+  authenticate,
+  celebrate(movieIdParamSchema),
+  deleteMovie,
+);
 
 /**
  * @swagger
@@ -161,7 +168,7 @@ router.delete('/movies/:movieId', celebrate(movieIdParamSchema), deleteMovie);
  */
 router.patch(
   '/movies/:movieId',
-  celebrate(movieIdParamSchema),
+  authenticate,
   celebrate(updateMovieSchema),
   updateMovie,
 );
