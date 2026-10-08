@@ -1,23 +1,36 @@
-import request from 'supertest';
+﻿import request from 'supertest';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import app from '../src/app.js';
 import { Movie } from '../src/models/movie.js';
+import { User } from '../src/models/user.js';
+import { Session } from '../src/models/session.js';
+import { createTestAgent } from './helpers/createTestAgent.js';
 
 let mongoServer;
+let agent;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri());
 });
 
+beforeEach(async () => {
+  agent = createTestAgent();
+  const res = await agent.post('/auth/register').send({
+    email: 'movies@example.com',
+    password: 'test-password',
+  });
+  expect(res.status).toBe(201);
+});
+
 afterEach(async () => {
-  await Movie.deleteMany({});
+  await Promise.all([Movie.deleteMany({}), User.deleteMany({}), Session.deleteMany({})]);
 });
 
 afterAll(async () => {
   await mongoose.disconnect();
-  await mongoServer.stop();
+  await mongoServer?.stop();
 });
 
 describe('GET /movies', () => {
@@ -70,7 +83,7 @@ describe('GET /movies/:movieId', () => {
 
 describe('POST /movies', () => {
   it('creates a movie with valid data', async () => {
-    const res = await request(app)
+    const res = await agent
       .post('/movies')
       .send({ title: 'New Movie', status: 'plan' });
 
@@ -79,13 +92,13 @@ describe('POST /movies', () => {
   });
 
   it('returns 400 when title is missing', async () => {
-    const res = await request(app).post('/movies').send({ status: 'plan' });
+    const res = await agent.post('/movies').send({ status: 'plan' });
 
     expect(res.status).toBe(400);
   });
 
   it('returns 400 for an invalid genre', async () => {
-    const res = await request(app)
+    const res = await agent
       .post('/movies')
       .send({ title: 'Bad Genre Movie', genres: 'NotARealGenre' });
 
@@ -97,7 +110,7 @@ describe('PATCH /movies/:movieId', () => {
   it('updates the movie status', async () => {
     const movie = await Movie.create({ title: 'To Update' });
 
-    const res = await request(app)
+    const res = await agent
       .patch(`/movies/${movie._id}`)
       .send({ status: 'watched' });
 
@@ -108,7 +121,7 @@ describe('PATCH /movies/:movieId', () => {
   it('returns 400 for an empty request body', async () => {
     const movie = await Movie.create({ title: 'To Update' });
 
-    const res = await request(app).patch(`/movies/${movie._id}`).send({});
+    const res = await agent.patch(`/movies/${movie._id}`).send({});
 
     expect(res.status).toBe(400);
   });
@@ -118,7 +131,7 @@ describe('DELETE /movies/:movieId', () => {
   it('deletes a movie', async () => {
     const movie = await Movie.create({ title: 'To Delete' });
 
-    const res = await request(app).delete(`/movies/${movie._id}`);
+    const res = await agent.delete(`/movies/${movie._id}`);
 
     expect(res.status).toBe(200);
 
@@ -128,10 +141,11 @@ describe('DELETE /movies/:movieId', () => {
 
   it('returns 404 when deleting the same movie twice', async () => {
     const movie = await Movie.create({ title: 'To Delete Twice' });
-    await request(app).delete(`/movies/${movie._id}`);
+    await agent.delete(`/movies/${movie._id}`);
 
-    const res = await request(app).delete(`/movies/${movie._id}`);
+    const res = await agent.delete(`/movies/${movie._id}`);
 
     expect(res.status).toBe(404);
   });
 });
+
