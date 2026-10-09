@@ -12,13 +12,19 @@ import { notFoundHandler } from './middleware/notFoundHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import moviesRoutes from './routes/moviesRoutes.js';
 
+const allowedOrigins = [
+  'https://movie-tracker-app-ten.vercel.app',
+  'http://localhost:5173',
+];
+
 const app = express();
 
 app.use(logger);
 app.use(express.json());
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: allowedOrigins,
     credentials: true,
   }),
 );
